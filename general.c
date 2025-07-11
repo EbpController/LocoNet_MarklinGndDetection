@@ -219,10 +219,6 @@ void lnRxMessageHandler(lnQueue_t* lnRxMsg)
             case 0x83:
             {
                 // global power ON request
-                for (uint8_t i = 0; i < 16; i++)
-                {
-                    gndDetectionInputUpdateRequired[i] = true;
-                }
                 break;
             }
         }
