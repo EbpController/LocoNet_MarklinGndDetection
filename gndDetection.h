@@ -34,7 +34,7 @@ bool powerState;
 uint16_t delayPowerOn;
 uint16_t delayPowerOff;
 bool oldGndDetectionInputState[16];
-bool gndDetectionInputUpdateRequired[16];
+bool gndDetectionInputUpdateRequest[16];
 uint16_t debounceState0[16];
 uint16_t debounceState1[16];
 uint8_t channels[16] = {0x1a, 0x1b, 0x14, 0x15, 0x1c, 0x1d, 0x1e, 0x1f, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};

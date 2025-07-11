@@ -23,13 +23,13 @@ void gndDetectionInit(gndDetectionCallback_t fptr)
     // set debounce state to maximum value
     for (uint8_t i = 0; i < 16; i++)
     {
-        // 
+        // clear all GND input states
         oldGndDetectionInputState[i] = false;
         // clear debounce states
         debounceState0[i] = 0;
         debounceState1[i] = 0;
-        // set initial flag state to update required
-        gndDetectionInputUpdateRequired[i] = true;
+        // set flag update request
+        gndDetectionInputUpdateRequest[i] = true;
     }
     // init of the ADC
     gndDetectionInitAdc();
@@ -101,7 +101,7 @@ void gndDetectionInitAdc()
  */
 void sampleGndDetectionInput()
 {
-    // this function has been  called after the (low priority) interrupt
+    // this function has been called after the (low priority) interrupt
     // from the ADC was fired
     if (getPowerState())
     {
@@ -124,8 +124,8 @@ void sampleGndDetectionInput()
             // clear the debounce states
             debounceState0[i] = 0;
             debounceState1[i] = 0;
-            // set update required flag
-            gndDetectionInputUpdateRequired[i] = true;
+            // set update request flag
+            gndDetectionInputUpdateRequest[i] = true;
         }
         // reset index counter
         gndDetectionInputIndex = 0;
@@ -173,35 +173,35 @@ void handleGndDetectionInputs()
     {
         if (adcResults[i] < THRESHOLD_LOW)
         {
-            if (oldGndDetectionInputState[i] || gndDetectionInputUpdateRequired[i])
+            if (oldGndDetectionInputState[i] || gndDetectionInputUpdateRequest[i])
             {
                 debounceState0[i] += 1;
                 debounceState1[i] = 0;
-                if ((debounceState0[i] > DEBOUNCE_DELAY_0) || gndDetectionInputUpdateRequired[i])
+                if ((debounceState0[i] > DEBOUNCE_DELAY_0) || gndDetectionInputUpdateRequest[i])
                 {
                     // then update the new state (= false)
                     oldGndDetectionInputState[i] = false;
                     debounceState0[i] = 0;
                     updateGndDetectionInput(i, true);
                     // clear update required flag
-                    gndDetectionInputUpdateRequired[i] = false;
+                    gndDetectionInputUpdateRequest[i] = false;
                 }
             }
         }
         else if (adcResults[i] > THRESHOLD_HIGH)
         {
-            if (!oldGndDetectionInputState[i] || gndDetectionInputUpdateRequired[i])
+            if (!oldGndDetectionInputState[i] || gndDetectionInputUpdateRequest[i])
             {
                 debounceState0[i] = 0;
                 debounceState1[i] += 1;
-                if ((debounceState1[i] > DEBOUNCE_DELAY_1) || gndDetectionInputUpdateRequired[i])
+                if ((debounceState1[i] > DEBOUNCE_DELAY_1) || gndDetectionInputUpdateRequest[i])
                 {
                     // then update the new state (= false)
                     oldGndDetectionInputState[i] = true;
                     debounceState1[i] = 0;
                     updateGndDetectionInput(i, false);
                     // clear update required flag
-                    gndDetectionInputUpdateRequired[i] = false;
+                    gndDetectionInputUpdateRequest[i] = false;
                 }
             }
         }
